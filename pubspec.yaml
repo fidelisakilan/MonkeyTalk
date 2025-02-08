@@ -38,9 +38,10 @@ dependencies:
   google_fonts: any
   speech_to_text: any
   permission_handler: any
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
+  sembast: any
+  extended_markdown_viewer: ^0.1.2+4
+  wave_divider: ^0.0.3
+  delightful_toast: ^1.1.0
 
 dev_dependencies:
   flutter_test:

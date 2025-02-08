@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kraken/modules/recorder/view/recorder_screen.dart';
+import 'package:kraken/modules/recorder/view/recorder_page.dart';
 import 'package:kraken/theme.dart';
 
 void main() {

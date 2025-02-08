@@ -1,6 +1,7 @@
 import 'package:kraken/config.dart';
+import 'package:kraken/modules/events/view/events_page.dart';
+import 'package:kraken/modules/journal/view/journal_page.dart';
 import 'package:kraken/modules/recorder/bloc/speech_manager.dart';
-import 'package:kraken/utils/dimensions.dart';
 
 class RecorderPage extends StatefulWidget {
   const RecorderPage({super.key});
@@ -19,7 +20,6 @@ class _RecorderScreenState extends State<RecorderPage> {
   }
 
   void startService() {
-    print("Hellow");
     speechManager.run(
       onResult: (String content) {
         print('content $content');
@@ -58,9 +58,7 @@ class _RecorderScreenState extends State<RecorderPage> {
                     child: Center(
                       child: FloatingActionButton.large(
                         heroTag: 'voice',
-                        shape: CircleBorder(),
                         backgroundColor: context.colorScheme.tertiaryContainer,
-                        elevation: 0,
                         onPressed: !value ? startService : stopService,
                         child: Icon(
                           !value ? Icons.circle_outlined : Icons.pause,
@@ -73,6 +71,27 @@ class _RecorderScreenState extends State<RecorderPage> {
             ],
           );
         },
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FloatingActionButton.large(
+            heroTag: 'events',
+            onPressed: () {
+              context.push(EventsPage());
+            },
+            child: const Icon(Icons.notifications),
+          ),
+          const GapBox(gap: Gap.s),
+          FloatingActionButton.large(
+            onPressed: () {
+              context.push(JournalPage());
+            },
+            heroTag: 'journal',
+            child: const Icon(Icons.book),
+          ),
+        ],
       ),
     );
   }
