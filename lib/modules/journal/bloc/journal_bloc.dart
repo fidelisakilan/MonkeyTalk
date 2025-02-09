@@ -72,7 +72,7 @@ class JournalBloc {
       Fluttertoast.showToast(msg: "Error ${response.message}");
       return null;
     }
-    return response.data;
+    return response.data["text"];
   }
 
   JournalModel? searchJournal(DateTime date) {

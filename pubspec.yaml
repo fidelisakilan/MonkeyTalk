@@ -43,6 +43,7 @@ dependencies:
   wave_divider: ^0.0.3
   delightful_toast: ^1.1.0
   fluttertoast: 8.2.10
+  auto_animated: any
 
 dev_dependencies:
   flutter_test:

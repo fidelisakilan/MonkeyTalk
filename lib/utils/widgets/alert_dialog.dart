@@ -46,7 +46,7 @@ void showDelightToast(
 }) {
   DelightToastBar(
     autoDismiss: true,
-    snackbarDuration: const Duration(milliseconds: 1500),
+    snackbarDuration: const Duration(milliseconds: 3000),
     position: DelightSnackbarPosition.top,
     builder: (context) => ToastCard(
       color: context.colorScheme.onPrimary,

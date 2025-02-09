@@ -1,3 +1,4 @@
+import 'package:auto_animated/auto_animated.dart';
 import 'package:kraken/config.dart';
 import 'package:kraken/modules/events/view/events_page.dart';
 import 'package:kraken/modules/journal/bloc/journal_bloc.dart';
@@ -83,15 +84,20 @@ class _JournalPageState extends State<JournalPage> {
     }
   }
 
+  bool _motivateLoader = false;
+
   void _motivateMe() async {
+    setState(() => _motivateLoader = true);
     final result = await _bloc.motivateMeApi();
     if (result != null && mounted) {
       showDelightToast(context, result);
     }
+    setState(() => _motivateLoader = false);
   }
 
   @override
   Widget build(BuildContext context) {
+    final options = LiveOptions(visibleFraction: 0.05);
     return RefreshIndicator(
       onRefresh: _bloc.loadData,
       child: Scaffold(
@@ -109,138 +115,164 @@ class _JournalPageState extends State<JournalPage> {
             ),
           ),
         ),
-        body: Stack(
+        body: Column(
           children: [
-            StreamBuilder<List<JournalModel>>(
-              stream: _bloc.journalStream,
-              builder: (context, snapshot) {
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [LoadingWidget()],
-                  );
-                }
-                return GridView.builder(
-                  padding: EdgeInsets.only(
-                      top: 10, bottom: 120, right: 10, left: 10),
-                  itemCount: snapshot.data!.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 1,
-                    crossAxisSpacing: 5,
-                    mainAxisSpacing: 5,
-                  ),
-                  itemBuilder: (context, index) {
-                    final journal = snapshot.data![index];
-                    return GestureDetector(
-                      onTap: () {
-                        context.push(ContentPage(journal: journal));
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          color: context.colorScheme.surfaceContainer,
+            if (_motivateLoader) LoadingWidget(),
+            Expanded(
+              child: Stack(
+                children: [
+                  StreamBuilder<List<JournalModel>>(
+                    stream: _bloc.journalStream,
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [LoadingWidget()],
+                        );
+                      }
+                      return LiveGrid.options(
+                        options: options,
+                        padding: EdgeInsets.only(
+                            top: 10, bottom: 120, right: 10, left: 10),
+                        itemCount: snapshot.data!.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 1,
+                          crossAxisSpacing: 5,
+                          mainAxisSpacing: 5,
                         ),
-                        child: Stack(
-                          alignment: Alignment.topRight,
-                          children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  journal.date.formattedText,
-                                  style: context.textTheme.bodySmall!
-                                      .copyWith(fontWeight: FontWeight.bold),
-                                ),
-                                Expanded(
-                                  child: Align(
-                                    alignment: Alignment.bottomLeft,
-                                    child: Text(
-                                      journal.title,
-                                      textAlign: TextAlign.left,
-                                      style: context.textTheme.titleLarge!
-                                          .copyWith(
-                                              fontWeight: FontWeight.normal),
-                                    ),
+                        itemBuilder: (context, index, animation) {
+                          final journal = snapshot.data![index];
+                          return FadeTransition(
+                            opacity: Tween<double>(
+                              begin: 0,
+                              end: 1,
+                            ).animate(animation),
+                            child: SlideTransition(
+                              position: Tween<Offset>(
+                                begin: Offset(0, -0.1),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: GestureDetector(
+                                onTap: () {
+                                  context.push(ContentPage(journal: journal));
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4),
+                                    color: context.colorScheme.surfaceContainer,
+                                  ),
+                                  child: Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            journal.date.formattedText,
+                                            style: context.textTheme.bodySmall!
+                                                .copyWith(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                          ),
+                                          Expanded(
+                                            child: Align(
+                                              alignment: Alignment.bottomLeft,
+                                              child: Text(
+                                                journal.title,
+                                                textAlign: TextAlign.left,
+                                                style: context
+                                                    .textTheme.titleLarge!
+                                                    .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.normal),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Text(
+                                        journal.emote,
+                                        style: context.textTheme.displaySmall,
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
+                              ),
                             ),
-                            Text(
-                              journal.emote,
-                              style: context.textTheme.displaySmall,
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: FloatingActionButton.small(
+                        heroTag: '1',
+                        onPressed: () {
+                          context.push(EventsPage());
+                        },
+                        child: ImageWidget(
+                          label: "potion.png",
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.all(15),
+                      child: FloatingActionButton.small(
+                        heroTag: '2',
+                        onPressed: _motivateMe,
+                        child: ImageWidget(
+                          label: "spellbook.png",
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: speechManager.speechState,
+                    builder: (context, value, child) {
+                      if (!value && content == null) {
+                        return SizedBox();
+                      }
+                      return Container(
+                        color:
+                            context.colorScheme.surface.withValues(alpha: 0.9),
+                        child: Stack(
+                          children: [
+                            Align(
+                              alignment: Alignment.topCenter,
+                              child: LinearProgressIndicator(
+                                backgroundColor: Colors.transparent,
+                                value: !value && content == null ? 0 : null,
+                              ),
+                            ),
+                            Align(
+                              alignment: Alignment.center,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  content ?? '',
+                                  textAlign: TextAlign.center,
+                                  style: context.textTheme.titleLarge,
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: FloatingActionButton.small(
-                  heroTag: '1',
-                  onPressed: () {
-                    context.push(EventsPage());
-                  },
-                  child: ImageWidget(
-                    label: "potion.png",
-                    size: 24,
+                      );
+                    },
                   ),
-                ),
+                ],
               ),
-            ),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: FloatingActionButton.small(
-                  heroTag: '2',
-                  onPressed: _motivateMe,
-                  child: ImageWidget(
-                    label: "spellbook.png",
-                    size: 24,
-                  ),
-                ),
-              ),
-            ),
-            ValueListenableBuilder<bool>(
-              valueListenable: speechManager.speechState,
-              builder: (context, value, child) {
-                if (!value && content == null) {
-                  return SizedBox();
-                }
-                return Container(
-                  color: context.colorScheme.surface.withValues(alpha: 0.9),
-                  child: Stack(
-                    children: [
-                      Align(
-                        alignment: Alignment.topCenter,
-                        child: LinearProgressIndicator(
-                          backgroundColor: Colors.transparent,
-                          value: !value && content == null ? 0 : null,
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.center,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            content ?? '',
-                            textAlign: TextAlign.center,
-                            style: context.textTheme.titleLarge,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
             ),
           ],
         ),
