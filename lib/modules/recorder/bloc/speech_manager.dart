@@ -14,11 +14,12 @@ class SpeechToTextManager {
     try {
       return await speech.initialize(
         onStatus: (text) {
-          if (text == 'listening') {
-            speechState.value = true;
-          } else {
+          log("STATUS::: $text");
+          if (text == 'done') {
             speechState.value = false;
             callback();
+          } else {
+            speechState.value = true;
           }
         },
         onError: (errorNotification) {

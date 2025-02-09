@@ -1,11 +1,16 @@
 class EventModel {
   final String content;
-  final bool isCompleted;
   final DateTime date;
+
+  factory EventModel.fromJson(Map<String, dynamic> json) {
+    return EventModel(
+      content: json["content"],
+      date: DateTime.parse((json['date'] as String)),
+    );
+  }
 
   EventModel({
     required this.content,
-    required this.isCompleted,
     required this.date,
   });
 }

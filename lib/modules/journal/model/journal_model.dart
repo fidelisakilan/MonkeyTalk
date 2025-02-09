@@ -4,6 +4,15 @@ class JournalModel {
   final String content;
   final DateTime date;
 
+  factory JournalModel.fromJson(Map<String, dynamic> json) {
+    return JournalModel(
+      date: DateTime.parse((json['date'] as String)),
+      content: json["content"],
+      emote: json["emote"],
+      title: json["title"],
+    );
+  }
+
   JournalModel({
     required this.emote,
     required this.title,

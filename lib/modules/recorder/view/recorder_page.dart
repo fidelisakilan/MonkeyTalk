@@ -46,28 +46,24 @@ class _RecorderScreenState extends State<RecorderPage> {
       body: ValueListenableBuilder<bool>(
         valueListenable: speechManager.speechState,
         builder: (context, value, child) {
-          return Stack(
+          return Column(
             children: [
-              Column(
-                children: [
-                  LinearProgressIndicator(
-                    backgroundColor: Colors.transparent,
-                    value: !value ? 0 : null,
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: FloatingActionButton.large(
-                        heroTag: 'voice',
-                        backgroundColor: context.colorScheme.tertiaryContainer,
-                        onPressed: !value ? startService : stopService,
-                        child: Icon(
-                          !value ? Icons.circle_outlined : Icons.pause,
-                        ),
-                      ),
-                    ),
-                  )
-                ],
+              LinearProgressIndicator(
+                backgroundColor: Colors.transparent,
+                value: !value ? 0 : null,
               ),
+              Expanded(
+                child: Center(
+                  child: FloatingActionButton.large(
+                    heroTag: 'voice',
+                    backgroundColor: context.colorScheme.tertiaryContainer,
+                    onPressed: !value ? startService : stopService,
+                    child: Icon(
+                      !value ? Icons.circle_outlined : Icons.pause,
+                    ),
+                  ),
+                ),
+              )
             ],
           );
         },

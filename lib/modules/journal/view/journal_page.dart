@@ -1,7 +1,9 @@
 import 'package:kraken/config.dart';
+import 'package:kraken/modules/events/view/events_page.dart';
 import 'package:kraken/modules/journal/bloc/journal_bloc.dart';
 import 'package:kraken/modules/journal/model/journal_model.dart';
 import 'package:kraken/modules/journal/view/content_page.dart';
+import 'package:kraken/modules/recorder/bloc/speech_manager.dart';
 import 'package:kraken/utils/widgets/loading_widget.dart';
 
 class JournalPage extends StatefulWidget {
@@ -13,6 +15,9 @@ class JournalPage extends StatefulWidget {
 
 class _JournalPageState extends State<JournalPage> {
   final JournalBloc _bloc = JournalBloc();
+  final speechManager = SpeechToTextManager();
+
+  String? content;
 
   @override
   void initState() {
@@ -23,79 +28,184 @@ class _JournalPageState extends State<JournalPage> {
   @override
   void dispose() {
     super.dispose();
-    _bloc.dispose();
+    speechManager.dispose();
+  }
+
+  void stopService() {
+    speechManager.stop();
+  }
+
+  void startService() {
+    content = null;
+    setState(() {});
+    speechManager.run(
+      onResult: (String content) {
+        this.content = content;
+        setState(() {});
+      },
+      onFailure: (error) {
+        print(error);
+      },
+      onComplete: () {
+        if (content != null && content!.trim().isNotEmpty) {
+          _sendContent();
+        } else {
+          Future.delayed(
+            const Duration(seconds: 1),
+            () {
+              content = null;
+              setState(() {});
+            },
+          );
+        }
+      },
+    );
+  }
+
+  void _sendContent() async {
+    await _bloc.hitRecordingContentApi(content!);
+    await _bloc.loadData();
+    await Future.delayed(Duration(seconds: 5));
+    content = null;
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("My Journal"),
+        title: Text("MonkeyTalk"),
+        centerTitle: true,
         backgroundColor: context.colorScheme.primaryContainer,
       ),
-      body: StreamBuilder<List<JournalModel>>(
-        stream: _bloc.journalStream,
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [LoadingWidget()],
-            );
-          }
-          return GridView.builder(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-            itemCount: snapshot.data!.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 1,
-              crossAxisSpacing: 5,
-              mainAxisSpacing: 5,
-            ),
-            itemBuilder: (context, index) {
-              final journal = snapshot.data![index];
-              return GestureDetector(
-                onTap: () {
-                  context.push(ContentPage(journal: journal));
-                },
-                child: Container(
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    color: context.colorScheme.surfaceContainer,
-                  ),
-                  child: Stack(
-                    alignment: Alignment.topRight,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+      body: Stack(
+        children: [
+          StreamBuilder<List<JournalModel>>(
+            stream: _bloc.journalStream,
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [LoadingWidget()],
+                );
+              }
+              return GridView.builder(
+                padding:
+                    EdgeInsets.only(top: 10, bottom: 300, right: 10, left: 10),
+                itemCount: snapshot.data!.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1,
+                  crossAxisSpacing: 5,
+                  mainAxisSpacing: 5,
+                ),
+                itemBuilder: (context, index) {
+                  final journal = snapshot.data![index];
+                  return GestureDetector(
+                    onTap: () {
+                      context.push(ContentPage(journal: journal));
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: context.colorScheme.surfaceContainer,
+                      ),
+                      child: Stack(
+                        alignment: Alignment.topRight,
                         children: [
-                          Text(
-                            journal.date.formattedText,
-                            style: context.textTheme.bodySmall!
-                                .copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          Expanded(
-                            child: Align(
-                              alignment: Alignment.bottomLeft,
-                              child: Text(
-                                journal.title,
-                                textAlign: TextAlign.left,
-                                style: context.textTheme.titleLarge!
-                                    .copyWith(fontWeight: FontWeight.normal),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                journal.date.formattedText,
+                                style: context.textTheme.bodySmall!
+                                    .copyWith(fontWeight: FontWeight.bold),
                               ),
-                            ),
+                              Expanded(
+                                child: Align(
+                                  alignment: Alignment.bottomLeft,
+                                  child: Text(
+                                    journal.title,
+                                    textAlign: TextAlign.left,
+                                    style: context.textTheme.titleLarge!
+                                        .copyWith(
+                                            fontWeight: FontWeight.normal),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            journal.emote,
+                            style: context.textTheme.displaySmall,
                           ),
                         ],
                       ),
-                      Text(
-                        journal.emote,
-                        style: context.textTheme.displaySmall,
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: Padding(
+              padding: const EdgeInsets.all(15),
+              child: FloatingActionButton.small(
+                onPressed: () {
+                  context.push(EventsPage());
+                },
+                child: Icon(Icons.notifications),
+              ),
+            ),
+          ),
+          ValueListenableBuilder<bool>(
+            valueListenable: speechManager.speechState,
+            builder: (context, value, child) {
+              if (!value && content == null) {
+                return SizedBox();
+              }
+              return Container(
+                color: context.colorScheme.surface.withValues(alpha: 0.9),
+                child: Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: LinearProgressIndicator(
+                        backgroundColor: Colors.transparent,
+                        value: !value && content == null ? 0 : null,
                       ),
-                    ],
-                  ),
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          content ?? '',
+                          textAlign: TextAlign.center,
+                          style: context.textTheme.titleLarge,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               );
             },
+          ),
+        ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: ValueListenableBuilder<bool>(
+        valueListenable: speechManager.speechState,
+        builder: (context, value, child) {
+          return FloatingActionButton.large(
+            heroTag: 'voice',
+            backgroundColor: context.colorScheme.tertiaryContainer,
+            onPressed: !value ? startService : stopService,
+            child: Icon(
+              !value ? Icons.circle_outlined : Icons.pause,
+            ),
           );
         },
       ),
