@@ -6,7 +6,9 @@ import 'package:kraken/env.dart';
 import 'api_response.dart';
 import 'exception_handler.dart';
 
-String get baseUrl => config['base_url']!;
+String? tempBaseUrl;
+
+String get baseUrl => tempBaseUrl ?? config['base_url']!;
 
 class NetworkRequester {
   late Dio _dio;
@@ -18,10 +20,10 @@ class NetworkRequester {
   static NetworkRequester get instance => _instance ??= NetworkRequester._();
 
   NetworkRequester._() {
-    _prepareRequest();
+    prepareRequest();
   }
 
-  _prepareRequest() async {
+  prepareRequest() async {
     BaseOptions dioOptions = BaseOptions(
       connectTimeout: const Duration(milliseconds: 60000),
       receiveTimeout: const Duration(milliseconds: 60000),
@@ -49,7 +51,7 @@ class NetworkRequester {
         logPrint: _printLog,
       ),
     ]);
-    _dioInitCompleter.complete();
+    if (!_dioInitCompleter.isCompleted) _dioInitCompleter.complete();
   }
 
   _printLog(Object object) => log(object.toString());

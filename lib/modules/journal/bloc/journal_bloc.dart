@@ -6,9 +6,7 @@ import 'package:kraken/utils/network/network_requester.dart';
 import 'package:rxdart/rxdart.dart';
 
 class JournalBloc {
-  JournalBloc._() {
-    loadData();
-  }
+  JournalBloc._();
 
   factory JournalBloc() => _instance ??= JournalBloc._();
 
@@ -39,12 +37,9 @@ class JournalBloc {
 
   Future<List<JournalModel>?> hitJournalApi() async {
     var response = await _networkRequester.post(path: "/journal", data: {});
-    if (response is APIException) {
-      print(response.message);
-    } else {
-      print(response);
+    if (response is! APIException) {
       List<JournalModel> journals = [];
-      for (Map<String, dynamic> e in (response as List)) {
+      for (Map<String, dynamic> e in (response.data as List)) {
         journals.add(JournalModel.fromJson(e));
       }
       return journals;
@@ -60,8 +55,7 @@ class JournalBloc {
         "content": content,
       },
     );
-    print(response.message);
-    return response! is Exception;
+    return response is! Exception;
   }
 
   JournalModel? searchJournal(DateTime date) {

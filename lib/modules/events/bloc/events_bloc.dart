@@ -22,7 +22,7 @@ class EventBloc {
 
   List<EventModel> _eventList = [];
 
-  void loadData() async {
+  Future<void> loadData() async {
     final result = await hitApi();
     if (result != null) {
       _eventList = result;
@@ -37,13 +37,12 @@ class EventBloc {
   }
 
   Future<List<EventModel>?> hitApi() async {
-    var response = await _networkRequester.post(path: "/events", data: {});
-    if (response is APIException) {
-      print(response.message);
-    } else {
-      print(response);
+    var response = await _networkRequester.post(path: "/events", data: {
+      "current_timestamp": "2025-02-02 00:00:00",
+    });
+    if (response is! APIException) {
       List<EventModel> events = [];
-      for (Map<String, dynamic> e in (response as List)) {
+      for (Map<String, dynamic> e in (response.data as List)) {
         events.add(EventModel.fromJson(e));
       }
       return events;

@@ -1,11 +1,19 @@
 class APIResponse<T> {
   late final String message;
-  late final dynamic data;
-  late final int? statusCode;
+  final dynamic data;
+  final int? statusCode;
 
-  APIResponse.fromJson(dynamic jsonResponse, this.statusCode) {
-    data = jsonResponse;
+  factory APIResponse.fromJson(dynamic jsonResponse, int? statusCode) {
+    return APIResponse(
+      data: jsonResponse,
+      statusCode: statusCode,
+    );
   }
+
+  APIResponse({
+    this.data,
+    this.statusCode,
+  });
 
   @override
   String toString() {
