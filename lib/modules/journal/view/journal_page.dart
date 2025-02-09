@@ -4,6 +4,7 @@ import 'package:kraken/modules/journal/bloc/journal_bloc.dart';
 import 'package:kraken/modules/journal/model/journal_model.dart';
 import 'package:kraken/modules/journal/view/content_page.dart';
 import 'package:kraken/modules/recorder/bloc/speech_manager.dart';
+import 'package:kraken/utils/widgets/image_widget.dart';
 import 'package:kraken/utils/widgets/loading_widget.dart';
 
 class JournalPage extends StatefulWidget {
@@ -77,6 +78,15 @@ class _JournalPageState extends State<JournalPage> {
         title: Text("MonkeyTalk"),
         centerTitle: true,
         backgroundColor: context.colorScheme.primaryContainer,
+        leading: IconButton(
+          onPressed: () {},
+          icon: Transform.rotate(
+            angle: 100,
+            child: ImageWidget(
+              label: "wizard1.png",
+            ),
+          ),
+        ),
       ),
       body: Stack(
         children: [
@@ -91,7 +101,7 @@ class _JournalPageState extends State<JournalPage> {
               }
               return GridView.builder(
                 padding:
-                    EdgeInsets.only(top: 10, bottom: 300, right: 10, left: 10),
+                    EdgeInsets.only(top: 10, bottom: 120, right: 10, left: 10),
                 itemCount: snapshot.data!.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
@@ -156,7 +166,10 @@ class _JournalPageState extends State<JournalPage> {
                 onPressed: () {
                   context.push(EventsPage());
                 },
-                child: Icon(Icons.notifications),
+                child: ImageWidget(
+                  label: "potion.png",
+                  size: 24,
+                ),
               ),
             ),
           ),
@@ -203,9 +216,9 @@ class _JournalPageState extends State<JournalPage> {
             heroTag: 'voice',
             backgroundColor: context.colorScheme.tertiaryContainer,
             onPressed: !value ? startService : stopService,
-            child: Icon(
-              !value ? Icons.circle_outlined : Icons.pause,
-            ),
+            child: !value
+                ? ImageWidget(label: "crystal.png", size: 50)
+                : Icon(Icons.pause),
           );
         },
       ),

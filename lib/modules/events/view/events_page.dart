@@ -3,6 +3,7 @@ import 'package:kraken/modules/events/bloc/events_bloc.dart';
 import 'package:kraken/modules/events/model/event_model.dart';
 import 'package:kraken/modules/journal/bloc/journal_bloc.dart';
 import 'package:kraken/modules/journal/view/content_page.dart';
+import 'package:kraken/utils/widgets/image_widget.dart';
 import 'package:kraken/utils/widgets/loading_widget.dart';
 import 'package:wave_divider/wave_divider.dart';
 
@@ -28,6 +29,15 @@ class _EventsPageState extends State<EventsPage> {
       appBar: AppBar(
         title: Text("Reminders"),
         backgroundColor: context.colorScheme.primaryContainer,
+        leading: IconButton(
+          onPressed: context.pop,
+          icon: Transform.rotate(
+            angle: 100,
+            child: ImageWidget(
+              label: "location.png",
+            ),
+          ),
+        ),
       ),
       body: StreamBuilder<List<EventModel>>(
         stream: _bloc.eventStream,
@@ -68,7 +78,10 @@ class _EventsPageState extends State<EventsPage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.open_in_new),
+                          icon: ImageWidget(
+                            label: "book1.png",
+                            size: 32,
+                          ),
                           onPressed: () {
                             final journal =
                                 JournalBloc().searchJournal(event.date);
@@ -78,7 +91,10 @@ class _EventsPageState extends State<EventsPage> {
                           },
                         ),
                         IconButton(
-                          icon: Icon(Icons.fiber_smart_record),
+                          icon: ImageWidget(
+                            label: "crystal.png",
+                            size: 32,
+                          ),
                           onPressed: () {
                             context.pop();
                           },
