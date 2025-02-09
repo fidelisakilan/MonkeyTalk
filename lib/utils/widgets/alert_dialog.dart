@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kraken/utils/network/network_requester.dart';
 
 Future<String?> showTextInputDialog(BuildContext context) async {
   final TextEditingController textController = TextEditingController();
@@ -10,7 +11,9 @@ Future<String?> showTextInputDialog(BuildContext context) async {
         title: const Text('Enter URL'),
         content: TextField(
           controller: textController,
-          decoration: const InputDecoration(),
+          decoration: InputDecoration(
+            hintText: baseUrl,
+          ),
         ),
         actions: <Widget>[
           TextButton(
