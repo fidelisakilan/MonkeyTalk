@@ -16,7 +16,7 @@ class App extends StatelessWidget {
         createTextTheme(context, "Inter Tight", "DM Serif Display");
     MaterialTheme theme = MaterialTheme(textTheme);
     return MaterialApp(
-      title: 'WatchDog',
+      title: 'MonkeyTalk',
       debugShowCheckedModeBanner: false,
       theme: theme.light(),
       scrollBehavior: ScrollConfiguration.of(context).copyWith(
