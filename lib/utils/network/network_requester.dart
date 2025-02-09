@@ -25,9 +25,9 @@ class NetworkRequester {
 
   prepareRequest() async {
     BaseOptions dioOptions = BaseOptions(
-      connectTimeout: const Duration(milliseconds: 60000),
-      receiveTimeout: const Duration(milliseconds: 60000),
-      sendTimeout: const Duration(milliseconds: 60000),
+      connectTimeout: const Duration(milliseconds: 90000),
+      receiveTimeout: const Duration(milliseconds: 90000),
+      sendTimeout: const Duration(milliseconds: 90000),
       baseUrl: baseUrl,
       responseType: ResponseType.json,
       headers: {

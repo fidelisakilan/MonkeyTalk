@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kraken/modules/journal/view/journal_page.dart';
 import 'package:kraken/theme.dart';
 
 void main() {
+  HttpOverrides.global = HttpRequestOverrides();
   runApp(const App());
 }
 
@@ -45,4 +48,13 @@ TextTheme createTextTheme(
     labelSmall: bodyTextTheme.labelSmall,
   );
   return textTheme;
+}
+
+class HttpRequestOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
 }

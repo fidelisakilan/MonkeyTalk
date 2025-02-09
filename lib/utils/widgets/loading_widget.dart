@@ -1,3 +1,4 @@
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kraken/config.dart';
 
 class LoadingWidget extends StatelessWidget {
@@ -7,4 +8,8 @@ class LoadingWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return const LinearProgressIndicator();
   }
+}
+
+void showToast(String message) {
+  Fluttertoast.showToast(msg: message);
 }

@@ -3,7 +3,7 @@ import 'package:kraken/modules/events/view/events_page.dart';
 import 'package:kraken/modules/journal/bloc/journal_bloc.dart';
 import 'package:kraken/modules/journal/model/journal_model.dart';
 import 'package:kraken/modules/journal/view/content_page.dart';
-import 'package:kraken/modules/recorder/bloc/speech_manager.dart';
+import 'package:kraken/modules/journal/bloc/speech_manager.dart';
 import 'package:kraken/utils/network/network_requester.dart';
 import 'package:kraken/utils/widgets/alert_dialog.dart';
 import 'package:kraken/utils/widgets/image_widget.dart';
@@ -73,13 +73,20 @@ class _JournalPageState extends State<JournalPage> {
   }
 
   void _changeUrl() async {
-    String? userInput = await showTextInputDialog(context);
+    String? userInput = await showUrlDialog(context);
     if (userInput != null) {
       tempBaseUrl = userInput.trim();
       NetworkRequester.instance.prepareRequest();
     } else {
       tempBaseUrl = null;
       NetworkRequester.instance.prepareRequest();
+    }
+  }
+
+  void _motivateMe() async {
+    final result = await _bloc.motivateMeApi();
+    if (result != null && mounted) {
+      showDelightToast(context, result);
     }
   }
 
@@ -177,11 +184,26 @@ class _JournalPageState extends State<JournalPage> {
               child: Padding(
                 padding: const EdgeInsets.all(15),
                 child: FloatingActionButton.small(
+                  heroTag: '1',
                   onPressed: () {
                     context.push(EventsPage());
                   },
                   child: ImageWidget(
                     label: "potion.png",
+                    size: 24,
+                  ),
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: Padding(
+                padding: const EdgeInsets.all(15),
+                child: FloatingActionButton.small(
+                  heroTag: '2',
+                  onPressed: _motivateMe,
+                  child: ImageWidget(
+                    label: "spellbook.png",
                     size: 24,
                   ),
                 ),

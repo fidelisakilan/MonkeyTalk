@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:kraken/modules/events/model/event_model.dart';
 import 'package:kraken/utils/network/exception_handler.dart';
 import 'package:kraken/utils/network/network_requester.dart';
@@ -47,42 +48,26 @@ class EventBloc {
       }
       return events;
     }
+    Fluttertoast.showToast(msg: "Error ${response.message}");
     return null;
   }
 }
 
 List<Map<String, dynamic>> mockEventData = [
   {
-    "date": "2025-02-02 00:00:00",
-    "content": "You need to start focusing on your OS exam prep."
+    "content": "OS exam reminder.",
+    "date": "2025-02-07",
   },
   {
-    "date": "2025-02-03 00:00:00",
-    "content":
-        "Another missed guitar lesson notification. Are you still attending?"
+    "content": "FIFA night is happening today.",
+    "date": "2025-02-07",
   },
   {
-    "date": "2025-02-04 00:00:00",
-    "content":
-        "You skipped the gym again today. Consider a short workout tomorrow."
+    "content": "Group project meeting.",
+    "date": "2025-02-08",
   },
   {
-    "date": "2025-02-05 00:00:00",
-    "content":
-        "Your project deadline is getting closer. Time to finalize things."
-  },
-  {
-    "date": "2025-02-06 00:00:00",
-    "content":
-        "You haven’t called your parents in a while. Maybe check in with them?"
-  },
-  {
-    "date": "2025-02-07 00:00:00",
-    "content":
-        "FIFA night was fun, but now you’re falling behind on your studies."
-  },
-  {
-    "date": "2025-02-08 00:00:00",
-    "content": "Only a few days left before the OS exam. Time to focus!"
-  },
+    "content": "Networking lecture.",
+    "date": "2025-02-08",
+  }
 ];

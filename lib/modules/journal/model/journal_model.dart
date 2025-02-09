@@ -8,7 +8,7 @@ class JournalModel {
     return JournalModel(
       date: DateTime.parse((json['date'] as String)),
       content: json["content"],
-      emote: json["emote"],
+      emote: json["emoji"],
       title: json["title"],
     );
   }

@@ -42,6 +42,7 @@ dependencies:
   extended_markdown_viewer: ^0.1.2+4
   wave_divider: ^0.0.3
   delightful_toast: ^1.1.0
+  fluttertoast: 8.2.10
 
 dev_dependencies:
   flutter_test:

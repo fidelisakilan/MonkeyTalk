@@ -1,7 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:delightful_toast/delight_toast.dart';
+import 'package:delightful_toast/toast/components/toast_card.dart';
+import 'package:delightful_toast/toast/utils/enums.dart';
+import 'package:kraken/config.dart';
 import 'package:kraken/utils/network/network_requester.dart';
 
-Future<String?> showTextInputDialog(BuildContext context) async {
+import 'image_widget.dart';
+
+Future<String?> showUrlDialog(BuildContext context) async {
   final TextEditingController textController = TextEditingController();
 
   return showDialog<String>(
@@ -32,4 +37,37 @@ Future<String?> showTextInputDialog(BuildContext context) async {
       );
     },
   );
+}
+
+void showDelightToast(
+  BuildContext context,
+  String message, {
+  Widget? actionButton,
+}) {
+  DelightToastBar(
+    autoDismiss: true,
+    snackbarDuration: const Duration(milliseconds: 1500),
+    position: DelightSnackbarPosition.top,
+    builder: (context) => ToastCard(
+      color: context.colorScheme.onPrimary,
+      leading: ImageWidget(
+        label: "wizard1.png"
+      ),
+      title: Row(
+        children: [
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: context.colorScheme.primary,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          if (actionButton != null) actionButton,
+        ],
+      ),
+    ),
+  ).show(context);
 }
